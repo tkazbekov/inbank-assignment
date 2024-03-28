@@ -1,0 +1,74 @@
+:root {
+  /* the violet-purple color */
+  --color-primary-100: #e3d2ff;
+  --color-primary-300: #bba8ff;
+  --color-primary-400: #aa93ff;
+  --color-primary-600: #9f85ff;
+  --color-primary-700: #60378b;
+  --color-primary-900: #21093a;
+
+  --color-secondary-300: #fbfbf9;
+  --color-secondary-400: #f0f0ea;
+  --color-secondary-600: #bdbdb8;
+  --color-secondary-700: #d9d4a7;
+
+  --color-accent-100: #fbfaf9;
+  --color-accent-200: #e9e9e9;
+  --color-accent-300: #dedede;
+  --color-accent-400: #9c9c9c;
+  --color-accent-500: #606060;
+
+  --color-error: #eb5757;
+
+  --color-white: #ffffff;
+
+  /* not sure about using the opacity for accent colors, maybe use these?
+  --color-text-light: #6f5989;
+  --color-text-lighter: #59476b; */
+  --color-text-default: var(--color-primary-900);
+  --color-text-disabled: var(--color-accent-400);
+
+  --color-bg-button-disabled: var(--color-accent-300);
+  --color-bg-input-disabled: var(--color-accent-100);
+
+  --ff-primary: 'Inter', sans-serif;
+  --ff-accent: 'Bitter', serif;
+
+  --fw-semi-bold: 500;
+  --fw-regular: 400;
+
+  --fs-200: 0.75rem;
+  --fs-300: 0.875rem;
+  --fs-400: 1rem;
+  --fs-500: 1.25rem;
+  --fs-600: 1.5rem;
+  --fs-700: 2rem;
+
+  --lh-100: 1rem;
+  --lh-200: 1.125rem;
+  --lh-300: 1.25rem;
+  --lh-400: 1.5rem;
+  --lh-500: 1.75rem;
+  --lh-600: 2rem;
+  --lh-700: 2.25rem;
+
+  --fs-body: var(--fs-400);
+  --fs-accent: var(--fs-700);
+  --fs-sub: var(--fs-300);
+  --fs-input-label: var(--fs-200);
+  --fs-modal-heading: var(--fs-500);
+
+  --fs-decision-heading: var(--fs-700);
+  --lh-decision-heading: var(--lh-700);
+}
+
+@media (width > 50rem) {
+  :root {
+    --fs-600: 3rem;
+    --lh-600: 3.5rem;
+    --fs-700: 4.25rem;
+    --lh-700: 4.5rem;
+    --fs-decision-heading: var(--fs-600);
+    --lh-decision-heading: var(--lh-600);
+  }
+}

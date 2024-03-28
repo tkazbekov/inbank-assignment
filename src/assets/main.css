@@ -1,0 +1,29 @@
+@import './reset.css';
+@import './variables.css';
+
+body {
+  font-family: var(--ff-primary);
+  color: var(--color-primary-900);
+  background-color: var(--color-secondary-300);
+}
+
+#app {
+  max-width: 96rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 96rem;
+  padding: 0 2.5rem;
+}
+
+.italic {
+  font-style: italic;
+}
+
+@media (max-width: 96rem) {
+  .container {
+    padding: 0 1rem;
+  }
+}
