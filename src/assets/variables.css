@@ -60,9 +60,11 @@
 
   --fs-decision-heading: var(--fs-700);
   --lh-decision-heading: var(--lh-700);
+
+  --header-height: 4.5rem;
 }
 
-@media (width > 50rem) {
+@media (width >= 91rem) {
   :root {
     --fs-600: 3rem;
     --lh-600: 3.5rem;
@@ -70,5 +72,7 @@
     --lh-700: 4.5rem;
     --fs-decision-heading: var(--fs-600);
     --lh-decision-heading: var(--lh-600);
+
+    --header-height: 7rem;
   }
 }

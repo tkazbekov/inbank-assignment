@@ -20,8 +20,10 @@ import SvgIcon from '@/components/SvgIcon.vue'
 }
 .header {
   padding-block: 1.5rem;
+  height: var(--header-height);
   & > nav {
     display: flex;
+    max-height: 100%;
   }
 }
 .logo-link {

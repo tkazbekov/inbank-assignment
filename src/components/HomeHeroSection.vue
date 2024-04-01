@@ -8,7 +8,9 @@
           Finance unforeseen expenses with Inbank. A quick and easy application process with an
           instant credit decision.
         </p>
-        <CustomButton class="hero-cta" type="accent">Apply now</CustomButton>
+        <CustomButton class="hero-cta" type="accent" @click="scrollToCalculator"
+          >Apply now</CustomButton
+        >
       </div>
       <img class="hero-image" src="@/assets/images/image-1.png" alt="mini loan hero" />
     </section>
@@ -17,6 +19,12 @@
 
 <script setup>
 import CustomButton from '@/components/CustomButton.vue'
+
+const emit = defineEmits(['scroll-to-calculator'])
+
+function scrollToCalculator() {
+  emit('scroll-to-calculator')
+}
 </script>
 
 <style scoped>

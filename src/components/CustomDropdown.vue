@@ -1,106 +1,184 @@
 <template>
-  <div class="dropdown">
-    <div class="dropdown-input" @click="toggleDropdown" :class="{ disabled: disabled }">
-      <input
-        class="input"
-        :class="{ filled: selectedOption }"
-        :id="inputId"
-        :value="selectedOption"
-        :placeholder="placeholder"
-        :disabled="disabled"
-      />
-      <label v-if="label" class="label" :for="inputId">{{ label }}</label>
+  <div class="select" :class="{ error: !isValid, expanded: isDropdownOpen }">
+    <CustomInput
+      class="select-input"
+      v-model="selectedOption.label"
+      :label="label"
+      :placeholder="placeholder"
+      type="dropdown"
+      :isValid="isValid"
+      @click="isDropdownOpen = !isDropdownOpen"
+    ></CustomInput>
+
+    <div class="dropdown" v-if="isDropdownOpen">
+      <ul role="list" class="dropdown-list">
+        <li
+          v-for="option in options"
+          :key="option.value"
+          class="dropdown-item"
+          @click="selectedOption = option"
+        >
+          {{ option.label }}
+        </li>
+      </ul>
     </div>
-    <ul v-if="isOpen" class="dropdown-menu">
-      <li v-for="option in options" :key="option" @click="selectOption(option)">{{ option }}</li>
-    </ul>
-    <div v-if="caption" class="caption">{{ caption }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue'
+import { computed, ref } from 'vue'
 
-type Props = {
+import CustomInput from './CustomInput.vue'
+
+type Option = {
+  label: string
+  value: string
+}
+
+interface Props {
+  modelValue: string
   label?: string
   placeholder?: string
-  caption?: string
   disabled?: boolean
-  modelValue: string
+  options: Option[]
+  isValid?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+  isValid: true
+})
 
-const inputId = `dropdown-input-${Math.random().toString(36).substring(2, 9)}`
-const selectedOption = ref(props.modelValue)
-const options = ['Option 1', 'Option 2', 'Option 3']
-const isOpen = ref(false)
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+}>()
 
-const toggleDropdown = () => {
-  if (!props.disabled) {
-    isOpen.value = !isOpen.value
+const isDropdownOpen = ref(false)
+
+const selectedOption = computed({
+  get() {
+    return findOptionByValue(props.modelValue)
+  },
+  set(option) {
+    if (isDropdownOpen.value) {
+      isDropdownOpen.value = false
+    }
+    emit('update:modelValue', option?.value || '')
   }
-}
+})
 
-const selectOption = (option: string) => {
-  selectedOption.value = option
-  isOpen.value = false
+function findOptionByValue(value: string) {
+  return props.options.find((option) => option.value === value) || props.options[0]
 }
 </script>
 
 <style scoped>
+.select {
+  --dropdown-caret-color: var(--color-accent-500);
+
+  position: relative;
+
+  &.error {
+    --dropdown-caret-color: var(--color-error);
+  }
+
+  &.expanded {
+    .select-input {
+      &::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+    }
+  }
+}
 .dropdown {
-  position: relative;
-  display: inline-block;
-  min-width: 10rem;
-}
+  --dropdown-caret-color: var(--color-primary-900);
 
-.dropdown-input {
-  position: relative;
-  cursor: pointer;
-}
-
-.label {
-  position: absolute;
-  color: var(--label-color);
-  font-weight: var(--fw-regular);
-  transform: translateX(1rem) translateY(0.75rem);
-  line-height: var(--lh-400);
-}
-
-.input {
   width: 100%;
-  padding: 8px;
-  border-radius: 0.5rem;
-  font-size: var(--fs-body);
-  padding: 0.75rem 1rem;
-  line-height: var(--lh-400);
-  border: 1px solid var(--border-color);
-  outline-color: var(--border-color);
-  background-color: var(--input-bg);
-}
-
-.dropdown-menu {
+  background-color: var(--color-white);
   position: absolute;
-  top: 100%;
-  left: 0;
-  list-style: none;
+  max-height: 12.5rem;
+  overflow-y: scroll;
+  border-radius: 0.5rem;
+  transform: translateY(0.25rem);
+
+  &.error {
+    --dropdown-caret-color: var(--color-error);
+  }
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-white);
+    border-radius: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 0.125rem solid var(--color-white);
+    border-radius: 1rem;
+    background-color: var(--color-primary-300);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary-400);
+  }
+}
+
+.dropdown-list {
   padding: 0;
-  margin: 0;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
 }
 
-.caption {
-  margin-top: 0.25rem;
-  padding: 0 1rem;
-  font-size: var(--fs-input-label);
-  color: var(--caption-color);
-  font-weight: var(--fw-semi-bold);
-  line-height: var(--lh-200);
+.dropdown-item {
+  padding: 0.75rem 1rem;
+
+  &:hover {
+    background-color: var(--color-primary-300);
+  }
 }
 
-.disabled {
-  cursor: not-allowed;
+.select-input {
+  width: 100%;
+  &::after {
+    content: '';
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--dropdown-caret-color);
+    -webkit-mask-image: url('@/assets/svg/caret.svg');
+    mask-image: url('@/assets/svg/caret.svg');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+  }
+}
+
+@media screen and (width < 91rem) {
+  .dropdown {
+    &::-webkit-scrollbar {
+      width: 1rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--color-white);
+      border-radius: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border: 0.25rem solid var(--color-white);
+      border-radius: 1rem;
+      background-color: var(--color-primary-300);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--color-primary-400);
+    }
+  }
 }
 </style>

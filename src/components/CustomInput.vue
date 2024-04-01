@@ -8,7 +8,7 @@
       :placeholder="placeholder"
       @input="onInput"
       @change="onChange"
-      :disabled="disabled"
+      :disabled="disabled || type === INPUT_TYPES.Dropdown"
       :inputmode="getInputMode()"
     />
     <label v-if="label" class="label" :for="inputId">{{ label }}</label>
@@ -18,15 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import test from 'node:test'
 import { ref, watch } from 'vue'
-
-const ERROR_CODES = {
-  tel: 'Invalid phone number format (8-11 digits)',
-  email: 'Invalid email format (email@example.com)',
-  required: 'This field cannot be empty',
-  number: 'This field only accepts numbers'
-}
 
 enum INPUT_TYPES {
   Text = 'text',
@@ -44,6 +36,8 @@ type Props = {
   modelValue: string
   type?: string
   required?: boolean
+  min?: string
+  max?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -55,6 +49,16 @@ const emit = defineEmits(['update:modelValue'])
 defineExpose({
   validate
 })
+
+const ERROR_CODES = {
+  telLength: 'Mobile number should be 7-8 digits long',
+  telStart: 'Mobile number should start with 55',
+  email: 'Invalid email format (email@example.com)',
+  required: 'This field cannot be empty',
+  number: 'This field only accepts numbers',
+  numberTooSmall: `The number cannot be smaller than ${props.min}`,
+  numberTooBig: `The number cannot be bigger than ${props.max}`
+}
 
 const inputId = `input-${Math.random().toString(36).substring(2, 9)}`
 const internalValue = ref(props.modelValue)
@@ -114,6 +118,7 @@ function getInputMode() {
 }
 
 function validate(value?: string) {
+  isValid.value = true
   const testString = value || props.modelValue
   if (!testString.length && props.required) {
     errorMessage.value = ERROR_CODES.required
@@ -122,30 +127,36 @@ function validate(value?: string) {
   }
   switch (props.type) {
     case INPUT_TYPES.Number: {
-      if (/^\d+$/.test(testString)) {
-        isValid.value = true
-        break
+      if (!/^\d+$/.test(testString)) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.number
+      } else if (props.min && +props.min > +testString) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.numberTooSmall
+      } else if (props.max && +props.max < +testString) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.numberTooBig
       }
-      errorMessage.value = ERROR_CODES.number
-      isValid.value = false
       break
     }
     case INPUT_TYPES.Email: {
-      if (/^.+@.+\..+$/.test(testString)) {
-        isValid.value = true
-        break
+      // the classic email regex, definitely not my creation
+      const emailRegex =
+        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+      if (!emailRegex.test(testString)) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.email
       }
-      errorMessage.value = ERROR_CODES.email
-      isValid.value = false
       break
     }
     case INPUT_TYPES.Tel: {
-      if (/^\d{8,11}$/.test(testString)) {
-        isValid.value = true
-        break
+      if (!/^55/.test(testString)) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.telStart
+      } else if (!/^\d{7,8}$/.test(testString)) {
+        isValid.value = false
+        errorMessage.value = ERROR_CODES.telLength
       }
-      errorMessage.value = ERROR_CODES.tel
-      isValid.value = false
       break
     }
     default:
@@ -181,7 +192,7 @@ watch(
     --border-color: var(--color-error);
   }
 
-  &:not(.error):has(.input:focus, .input.filled) {
+  &:not(.error, .disabled):has(.input:focus, .input.filled) {
     --label-color: var(--color-primary-700);
     --border-color: var(--color-primary-700);
   }
@@ -212,7 +223,6 @@ watch(
 
 .input {
   width: 100%;
-  padding: 8px;
   border-radius: 0.5rem;
   font-size: var(--fs-body);
   padding: 0.75rem 1rem;
@@ -242,6 +252,10 @@ watch(
 
   &:focus::placeholder {
     opacity: 100%;
+  }
+
+  &:disabled {
+    pointer-events: none;
   }
 }
 

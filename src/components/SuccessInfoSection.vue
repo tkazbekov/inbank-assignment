@@ -17,22 +17,24 @@ import CustomButton from './CustomButton.vue';
                 <div class="divider" />
                 <li class="list-item">
                   <span class="item-label">Loan amount</span>
-                  <span class="item-value">2 500 €</span>
+                  <span class="item-value">{{ store.loanData.amount }} €</span>
                 </li>
                 <div class="divider" />
                 <li class="list-item">
                   <span class="item-label">Loan period</span>
-                  <span class="item-value">48 months</span>
+                  <span class="item-value">{{ store.loanData.period }} months</span>
                 </li>
                 <div class="divider" />
                 <li class="list-item">
                   <span class="item-label">Monthly payment</span>
-                  <span class="item-value">144.84 €</span>
+                  <span class="item-value">{{ store.loanData.monthly }} €</span>
                 </li>
                 <div class="divider" />
               </ul>
             </div>
-            <CustomButton class="content-action">Back to home page</CustomButton>
+            <RouterLink class="content-action" to="/">
+              <CustomButton class="content-action">Back to home page</CustomButton>
+            </RouterLink>
           </div>
         </div>
       </div>
@@ -41,7 +43,10 @@ import CustomButton from './CustomButton.vue';
 </template>
 
 <script setup>
+import { useLoanStore } from '@/stores/loan'
 import CustomButton from '@/components/CustomButton.vue'
+
+const store = useLoanStore()
 </script>
 
 <style scoped>
@@ -102,6 +107,7 @@ import CustomButton from '@/components/CustomButton.vue'
   font-family: var(--ff-accent);
   font-size: var(--fs-decision-heading);
   line-height: var(--lh-decision-heading);
+  margin-bottom: 0.5rem;
 }
 
 .content-data {
@@ -142,6 +148,7 @@ import CustomButton from '@/components/CustomButton.vue'
 @container (width < 89rem) {
   .success {
     background-color: var(--color-white);
+    height: calc(100vh - var(--header-height));
     padding: 2.5rem 1rem 5rem;
   }
   .success-body {

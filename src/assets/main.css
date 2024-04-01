@@ -13,6 +13,10 @@ body {
   margin: 0 auto;
 }
 
+main {
+  min-height: calc(100vh - var(--header-height));
+}
+
 .container {
   max-width: 96rem;
   padding: 0 2.5rem;

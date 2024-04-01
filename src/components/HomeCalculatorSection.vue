@@ -9,28 +9,42 @@
       <div class="calculations calculator-section">
         <div class="calculations-inputs">
           <div class="calculations-inputgroup">
-            <CustomSlider v-model="value1" class="calculations-slider" max="10000"></CustomSlider>
+            <CustomSlider
+              @input="onInput"
+              v-model="amount"
+              class="calculations-slider"
+              min="300"
+              step="100"
+              max="7200"
+            ></CustomSlider>
             <CustomInput
-              v-model="value1"
+              v-model="amount"
               class="calculations-textinput"
               label="Amount"
               type="number"
             ></CustomInput>
           </div>
           <div class="calculations-inputgroup">
-            <CustomSlider v-model="value2" class="calculations-slider"></CustomSlider>
-            <CustomInput
-              v-model="value2"
+            <CustomSlider
+              @input="onInput"
+              v-model="period"
+              class="calculations-slider"
+              min="2"
+              max="72"
+              currency="months"
+            ></CustomSlider>
+            <CustomDropdown
+              v-model="period"
               class="calculations-textinput"
               label="Period"
-              type="dropdown"
-            ></CustomInput>
+              :options="dropdownOptions"
+            ></CustomDropdown>
           </div>
         </div>
         <div class="calculations-result">
           <div class="result-text">
             <p class="result-heading">Monthly payment</p>
-            <h1 class="result-value">144.84€</h1>
+            <h1 class="result-value">{{ monthly }}€</h1>
           </div>
           <CustomButton class="result-cta" @click="openModal">Apply now</CustomButton>
           <p class="result-footer">
@@ -39,7 +53,12 @@
             by AS Inbank Finance.
           </p>
           <Teleport to="body">
-            <ApplicationModal :show="isModalOpen" @close="closeModal" />
+            <ApplicationModal
+              @submit="apply"
+              :show="isModalOpen"
+              @close="closeModal"
+              :loading="isModalLoading"
+            />
           </Teleport>
         </div>
       </div>
@@ -48,17 +67,31 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 import CustomButton from '@/components/CustomButton.vue'
 import CustomSlider from '@/components/CustomSlider.vue'
-import CustomDropdown from '@/components/CustomDropdown.vue'
 import CustomInput from '@/components/CustomInput.vue'
-import ApplicationModal from '@/components/ApplicationModal.vue'
-import { ref } from 'vue'
+import CustomDropdown from '@/components/CustomDropdown.vue'
 
-const value1 = ref('20')
-const value2 = ref('50')
-const value3 = ref('1')
+import { useLoanStore } from '@/stores/loan'
+import type { ApplicationData } from '@/types/Loan'
+import ApplicationModal from '@/components/ApplicationModal.vue'
+
+const router = useRouter()
+const loanStore = useLoanStore()
+
+const amount = ref('500')
+const period = ref('48')
+const monthly = ref(calculate())
 const isModalOpen = ref(false)
+const isModalLoading = ref(false)
+
+const dropdownOptions = []
+for (let i = 2; i <= 72; i++) {
+  dropdownOptions.push({ label: `${i} months`, value: String(i) })
+}
 
 function openModal() {
   isModalOpen.value = true
@@ -66,6 +99,32 @@ function openModal() {
 
 function closeModal() {
   isModalOpen.value = false
+}
+
+async function apply(data: Partial<ApplicationData>) {
+  isModalLoading.value = true
+  const applicationData: ApplicationData = {
+    ...data,
+    amount: +amount.value,
+    period: +period.value
+  } as ApplicationData
+  try {
+    const result = await loanStore.apply(applicationData)
+    isModalLoading.value = false
+    if (result.success) router.push({ name: 'success' })
+    else router.push({ name: 'rejection' })
+  } catch (e) {
+    isModalLoading.value = false
+  }
+}
+
+function onInput() {
+  monthly.value = calculate()
+}
+
+function calculate() {
+  const result = loanStore.calculate(+amount.value, +period.value)
+  return result
 }
 </script>
 
@@ -167,6 +226,7 @@ function closeModal() {
   font-size: var(--fs-input-label);
   line-height: var(--lh-100);
   opacity: 60%;
+  flex: 1 1 100%;
 }
 
 @container (width < 89rem) {

@@ -4,7 +4,7 @@
       <div class="modal-body">
         <div class="modal-header">
           <h2 class="header-caption">Personal details</h2>
-          <button class="header-close" @click="$emit('close')">
+          <button class="header-close" @click="close">
             <SvgIcon class="close-icon" iconName="cross" />
           </button>
         </div>
@@ -47,25 +47,41 @@
             v-model="income"
             label="Monthly income"
             class="form-input"
+            min="100"
             required
           ></CustomInput>
         </form>
-        <CustomButton class="form-submit" @click="onSubmit">Submit</CustomButton>
+        <CustomButton class="form-submit" @click="onSubmit">
+          Submit
+          <LoadingSpinner class="loading-spinner" v-if="loading" />
+        </CustomButton>
       </div>
       <div class="modal-clickout" @click="$emit('close')"></div>
     </div>
   </Transition>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, defineEmits } from 'vue'
 
 import SvgIcon from '@/components/SvgIcon.vue'
 import CustomButton from '@/components/CustomButton.vue'
 import CustomInput from '@/components/CustomInput.vue'
-defineProps({
-  show: Boolean
-})
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
+import type { ApplicationData } from '@/types/Loan'
+
+type Props = {
+  show: boolean
+  loading: boolean
+}
+
+defineProps<Props>()
+
+const emit = defineEmits<{
+  submit: [data: Partial<ApplicationData>]
+  close: []
+}>()
 
 const firstName = ref('')
 const lastName = ref('')
@@ -86,6 +102,10 @@ const inputRefs = ref([
   incomeInputRef
 ])
 
+function close() {
+  emit('close')
+}
+
 function onSubmit() {
   if (!validate()) {
     return
@@ -98,7 +118,7 @@ function onSubmit() {
     income: income.value
   }
 
-  console.log('submitting', formData)
+  emit('submit', formData)
 }
 
 function validate() {
@@ -176,6 +196,13 @@ function validate() {
 
 .form-submit {
   width: 100%;
+  position: relative;
+}
+
+.loading-spinner {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
 }
 
 .modal-clickout {

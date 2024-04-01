@@ -1,10 +1,3 @@
-# TODO
-
-- dropdown
-- rejection page
-- put proper values for the sliders
-- use store for the "loan application"
-
 # inbank-assignment
 
 This template should help get you started developing with Vue 3 in Vite.

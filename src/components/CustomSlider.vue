@@ -72,11 +72,9 @@ watch(
     if (!isNaN(value)) {
       if (value > +props.max) {
         emit('update:modelValue', isString(props.modelValue) ? `${props.max}` : +props.max)
-        return
       }
       if (value <= +props.min) {
         emit('update:modelValue', isString(props.modelValue) ? `${props.min}` : +props.min)
-        return
       }
     }
     internalValue.value = value
@@ -114,7 +112,7 @@ input[type='range'] {
     height: var(--slider-thumb-height);
     width: var(--slider-thumb-width);
     border-radius: var(--slider-thumb-border-radius);
-    background: var(--color-primary-400);
+    background-color: var(--color-primary-400);
     cursor: pointer;
     /* Calculations will put the thumb in the middle of the track, presumably */
     margin-top: calc(0px - ((var(--slider-thumb-height) - var(--slider-track-height)) / 2));
@@ -122,6 +120,11 @@ input[type='range'] {
     background-image: url('@/assets/svg/arrows-slider.svg');
     background-repeat: no-repeat;
     background-position: center center;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    background-color: var(--color-primary-300);
   }
 
   &::-webkit-slider-runnable-track {
