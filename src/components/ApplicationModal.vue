@@ -89,11 +89,11 @@ const mobile = ref('')
 const email = ref('')
 const income = ref('')
 
-const firstNameInputRef = ref(null)
-const lastNameInputRef = ref(null)
-const telInputRef = ref(null)
-const emailInputRef = ref(null)
-const incomeInputRef = ref(null)
+const firstNameInputRef = ref<InstanceType<typeof CustomInput> | null>(null)
+const lastNameInputRef = ref<InstanceType<typeof CustomInput> | null>(null)
+const telInputRef = ref<InstanceType<typeof CustomInput> | null>(null)
+const emailInputRef = ref<InstanceType<typeof CustomInput> | null>(null)
+const incomeInputRef = ref<InstanceType<typeof CustomInput> | null>(null)
 const inputRefs = ref([
   firstNameInputRef,
   lastNameInputRef,
@@ -115,7 +115,7 @@ function onSubmit() {
     lastName: lastName.value,
     mobile: mobile.value,
     email: email.value,
-    income: income.value
+    income: +income.value
   }
 
   emit('submit', formData)
@@ -124,6 +124,9 @@ function onSubmit() {
 function validate() {
   var isFormValid = true
   inputRefs.value.forEach((input) => {
+    if (!input.value) {
+      return
+    }
     if (!input.value.validate()) {
       isFormValid = false
     }

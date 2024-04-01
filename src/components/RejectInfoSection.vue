@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <section class="rejection">
-      <div class="rejection-body">
+      <div class="rejection-body" v-if="store.loanData">
         <div class="body-main">
           <div class="main-text">
             <h1 class="text-heading">

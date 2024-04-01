@@ -30,7 +30,7 @@ import { computed, ref } from 'vue'
 
 import CustomInput from './CustomInput.vue'
 
-type Option = {
+export type Option = {
   label: string
   value: string
 }

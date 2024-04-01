@@ -74,6 +74,7 @@ import CustomButton from '@/components/CustomButton.vue'
 import CustomSlider from '@/components/CustomSlider.vue'
 import CustomInput from '@/components/CustomInput.vue'
 import CustomDropdown from '@/components/CustomDropdown.vue'
+import type { Option } from '@/components/CustomDropdown.vue'
 
 import { useLoanStore } from '@/stores/loan'
 import type { ApplicationData } from '@/types/Loan'
@@ -88,7 +89,7 @@ const monthly = ref(calculate())
 const isModalOpen = ref(false)
 const isModalLoading = ref(false)
 
-const dropdownOptions = []
+const dropdownOptions: Option[] = []
 for (let i = 2; i <= 72; i++) {
   dropdownOptions.push({ label: `${i} months`, value: String(i) })
 }
